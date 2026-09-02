@@ -242,3 +242,12 @@ With multiple developers:
 - 提交建议：每个逻辑组完成后 `git commit`（如 `feat(auth): send-sms endpoint + cooldown`）
 - 任一 Phase Checkpoint 可停下独立验证该 Story
 - 严格遵循 `- [ ] T### [P] [US#] 描述 + 路径` 格式；禁止无 ID/无 Story/无路径的模糊任务
+
+---
+
+## Phase 7: Convergence
+
+**Purpose**: `/speckit-converge` 收敛评估（2026-09-02）——代码库相对 spec/plan/tasks 的剩余差距
+
+- [x] T056 将 CI 流水线对齐 npm workspaces：`.github/workflows/ci.yml` 从 `pnpm/action-setup` + `pnpm install --frozen-lockfile` + `pnpm typecheck/lint/test/build/test:e2e/storybook:test` 改为 `actions/setup-node` + `npm ci` + `npm run typecheck/lint/test/build/test:e2e/storybook:test`（并同步删除或重建与 npm workspaces 一致的 `pnpm-lock.yaml`，避免 frozen-lockfile 校验失败）per T007 / plan: Monorepo 决策（contradicts）
+- [x] T057 补齐 Storybook a11y addon：在 `frontend/package.json` devDependencies 安装 `@storybook/addon-a11y`（`main.ts` 已声明该 addon，但依赖缺失导致 Storybook 启动/axe 断言失败）；若确认不需要该 addon 则从 `frontend/.storybook/main.ts` addons 数组移除并说明理由 per T050 / plan: Storybook + axe（partial）

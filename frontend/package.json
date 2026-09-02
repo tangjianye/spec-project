@@ -14,7 +14,7 @@
     "test:unit": "vitest run tests/unit",
     "test:integration": "vitest run tests/integration",
     "test:e2e": "playwright test",
-    "storybook:test": "storybook test"
+    "storybook:test": "start-server-and-test \"storybook dev -p 6006 --no-open\" http://127.0.0.1:6006 \"test-storybook\""
   },
   "dependencies": {
     "@spec/shared-schemas": "file:../packages/shared-schemas",
@@ -27,16 +27,20 @@
   "devDependencies": {
     "@axe-core/playwright": "^4.9.0",
     "@playwright/test": "^1.44.0",
+    "@storybook/addon-a11y": "^8.6.18",
     "@storybook/react-vite": "^8.1.0",
+    "@storybook/test-runner": "^0.19.1",
     "@testing-library/jest-dom": "^6.4.0",
     "@testing-library/react": "^15.0.0",
     "@testing-library/user-event": "^14.5.0",
     "@types/react": "^18.3.0",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.3.0",
+    "axe-playwright": "^2.2.2",
     "eslint-plugin-jsx-a11y": "^6.8.0",
     "jsdom": "^24.1.0",
     "msw": "^2.3.0",
+    "start-server-and-test": "^2.1.5",
     "vite": "^5.3.0",
     "vitest": "^1.6.0"
   }

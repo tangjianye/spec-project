@@ -1,10 +1,12 @@
 # dependencies
 node_modules/
 .pnpm-store/
+.npm/
 
 # builds
 dist/
 build/
+storybook-static/
 *.tsbuildinfo
 
 # env & secrets

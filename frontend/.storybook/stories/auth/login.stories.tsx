@@ -3,11 +3,11 @@
  */
 import type { Meta, StoryObj } from '@storybook/react';
 import { MemoryRouter } from 'react-router-dom';
-import { LoginForm } from '../../src/features/auth/components/LoginForm';
-import { PhoneInput } from '../../src/features/auth/components/PhoneInput';
-import { CodeInput } from '../../src/features/auth/components/CodeInput';
-import { PasswordInput } from '../../src/features/auth/components/PasswordInput';
-import { CountdownButton } from '../../src/features/auth/components/CountdownButton';
+import { LoginForm } from '../../../src/features/auth/components/LoginForm';
+import { PhoneInput } from '../../../src/features/auth/components/PhoneInput';
+import { CodeInput } from '../../../src/features/auth/components/CodeInput';
+import { PasswordInput } from '../../../src/features/auth/components/PasswordInput';
+import { CountdownButton } from '../../../src/features/auth/components/CountdownButton';
 
 const meta: Meta<typeof LoginForm> = {
   title: 'Auth/LoginForm',
