@@ -6,7 +6,7 @@ export default defineConfig({
     include: ['tests/**/*.{test,spec}.ts'],
     coverage: {
       provider: 'v8',
-      include: ['src/modules/user/avatar-storage.ts', 'src/modules/user/profile.service.ts', 'src/modules/user/user.entity.ts'],
+      include: ['src/index.ts'],
       thresholds: { lines: 80, functions: 80, statements: 80, branches: 80 }
     }
   }

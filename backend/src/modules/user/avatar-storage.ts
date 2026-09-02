@@ -17,6 +17,24 @@ export interface ProfileImageRecord {
 export class AvatarStorage {
   private readonly images = new Map<string, ProfileImageRecord>();
 
+  constructor(private readonly now: () => Date = () => new Date()) {}
+
+  cleanupExpired(): number {
+    const now = this.now().toISOString();
+    let deleted = 0;
+    for (const [imageId, image] of this.images) {
+      if (image.status === 'temporary' && image.expiresAt && image.expiresAt <= now) {
+        this.images.delete(imageId);
+        deleted += 1;
+      }
+    }
+    return deleted;
+  }
+
+  get size(): number {
+    return this.images.size;
+  }
+
   create(ownerUserId: string, data: Buffer, mediaType: ProfileImageRecord['mediaType']): ProfileImageRecord {
     const imageId = `img_${randomUUID()}`;
     const record: ProfileImageRecord = {
@@ -27,17 +45,17 @@ export class AvatarStorage {
       data,
       publicUrl: `data:${mediaType};base64,${data.toString('base64')}`,
       status: 'temporary',
-      createdAt: new Date().toISOString(),
-      expiresAt: new Date(Date.now() + 24 * 60 * 60_000).toISOString()
+      createdAt: this.now().toISOString(),
+      expiresAt: new Date(this.now().getTime() + 24 * 60 * 60_000).toISOString()
     };
     this.images.set(imageId, record);
     return record;
   }
 
   findOwnedBindable(ownerUserId: string, imageId: string): ProfileImageRecord | null {
+    this.cleanupExpired();
     const image = this.images.get(imageId);
     if (!image || image.ownerUserId !== ownerUserId) return null;
-    if (image.status === 'temporary' && image.expiresAt && image.expiresAt <= new Date().toISOString()) return null;
     return image.status === 'temporary' || image.status === 'active' ? image : null;
   }
 

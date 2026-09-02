@@ -115,18 +115,19 @@ Supertest 契约测试至少覆盖：
 |------|--------|----------|
 | TypeScript strict | PASS | `npm run typecheck`，3/3 workspaces passed |
 | ESLint | PASS | `npm run lint`，0 errors/warnings |
-| Unit/integration/contract | PASS | `npm test`：shared 8、frontend 20、backend 36，共 64 tests |
-| Production build | PASS | `npm run build`；EditProfilePage lazy chunk 7.76 kB (3.44 kB gzip) |
-| Playwright E2E | PASS | 7/7 tests；资料编辑完整流程 1.2s |
-| Storybook a11y | PASS | 9/9 stories；资料默认/错误态均无 axe violations |
+| Unit/integration/contract | PASS | `npm test`：shared 8、frontend 23、backend 42，共 73 tests |
+| Coverage thresholds | PASS | `npm run test:coverage`：shared 100% lines、frontend 87.26% lines/61.29% functions、backend 99.22% lines；均通过 80% business / 60% rendering 门禁 |
+| Production build | PASS | `npm run build`；EditProfilePage lazy chunk 9.34 kB (4.14 kB gzip) |
+| Playwright E2E | PASS | 9/9 tests；含刷新提醒、双窗口 409、LCP/INP/CLS 与保存反馈断言 |
+| Storybook a11y | PASS | 17/17 stories；默认、错误、禁用、键盘、上传和无障碍状态均无 axe violations |
 
 ### Security and contract review
 
 - 三个资料接口均由 `requireAuth` 保护，用户 ID 只取自令牌 `sub`。
 - JSON 资料请求继续受 input guard 保护；日志只记录用户 ID、版本、图片 ID、大小和媒体类型，不记录 bio、图片内容或令牌。
-- multipart 仅接受单文件并在内存层限制 5 MB；服务端使用 Sharp 解码真实内容并统一输出 WebP，文件扩展名和客户端 MIME 不作为信任依据。
+- multipart 仅接受单文件并在内存层限制 5 MB；服务端使用 Sharp 解码真实内容，要求声明 MIME 与 JPEG/PNG/WebP 解码格式一致，再统一输出 WebP。
 - PATCH 先校验完整 payload 和头像所有权，再执行单次版本化更新；409 返回最新资料且不自动重试。
-- 临时头像按所有者隔离并带 24 小时过期时间；激活新头像时旧头像进入 superseded 状态。
+- 临时头像按所有者隔离并带 24 小时过期时间；过期扫描会删除对应缓冲区，激活新头像时旧头像进入 superseded 状态。
 
 ### Performance and accessibility review
 

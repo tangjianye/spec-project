@@ -7,15 +7,17 @@ interface TextFieldProps {
   maxLength: number;
   multiline?: boolean;
   required?: boolean;
+  disabled?: boolean;
 }
 
-export function TextField({ id, label, value, onChange, error, maxLength, multiline, required }: TextFieldProps) {
+export function TextField({ id, label, value, onChange, error, maxLength, multiline, required, disabled }: TextFieldProps) {
   const describedBy = `${id}-count${error ? ` ${id}-error` : ''}`;
   const common = {
     id,
     value,
     maxLength,
     required,
+    disabled,
     'aria-invalid': !!error,
     'aria-describedby': describedBy,
     onChange: (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => onChange(event.target.value)

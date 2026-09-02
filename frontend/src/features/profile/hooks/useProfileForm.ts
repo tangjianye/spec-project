@@ -24,6 +24,8 @@ export function useProfileForm() {
   const [status, setStatus] = useState<'loading' | 'idle' | 'saving' | 'success' | 'error' | 'conflict'>('loading');
   const [message, setMessage] = useState('');
   const [previewUrl, setPreviewUrl] = useState('');
+  const [uploadProgress, setUploadProgress] = useState<number | null>(null);
+  const [conflict, setConflict] = useState<{ currentProfile: UserProfile; localDraft: ProfileDraft } | null>(null);
   const updateSummary = useAuthStore((state) => state.updateUserSummary);
 
   const dirty = useMemo(() => !!profile && JSON.stringify(draft) !== JSON.stringify(draftFrom(profile)), [draft, profile]);
@@ -37,6 +39,7 @@ export function useProfileForm() {
       setDraft(draftFrom(latest));
       setPreviewUrl(latest.avatarUrl);
       setErrors({});
+      setConflict(null);
       setStatus('idle');
       setMessage('');
     } catch (error) {
@@ -64,7 +67,7 @@ export function useProfileForm() {
       setMessage('请修正标记的字段后再保存');
       return;
     }
-    setStatus('saving');
+      setStatus('saving');
     try {
       const saved = await updateProfile(checked.data);
       setProfile(saved);
@@ -72,6 +75,7 @@ export function useProfileForm() {
       setPreviewUrl(saved.avatarUrl);
       updateSummary({ nickname: saved.nickname, avatarUrl: saved.avatarUrl });
       setErrors({});
+      setConflict(null);
       setStatus('success');
       setMessage('个人资料已保存');
     } catch (error) {
@@ -79,7 +83,12 @@ export function useProfileForm() {
         const fieldErrors: Partial<Record<ProfileField, string>> = {};
         for (const item of error.errors) fieldErrors[item.field as ProfileField] = item.message;
         setErrors(fieldErrors);
-        setStatus(error.code === ErrorCode.PROFILE_CONFLICT ? 'conflict' : 'error');
+        if (error.code === ErrorCode.PROFILE_CONFLICT && error.currentProfile) {
+          setConflict({ currentProfile: error.currentProfile, localDraft: { ...draft } });
+          setStatus('conflict');
+        } else {
+          setStatus('error');
+        }
         setMessage(error.message);
       } else {
         setStatus('error');
@@ -99,17 +108,32 @@ export function useProfileForm() {
     }
     const localUrl = URL.createObjectURL(file);
     setPreviewUrl(localUrl);
+    setUploadProgress(0);
     try {
-      const uploaded = await uploadAvatar(file);
+      const uploaded = await uploadAvatar(file, setUploadProgress);
       setField('avatarImageId', uploaded.imageId);
       setPreviewUrl(uploaded.previewUrl);
+      setUploadProgress(100);
       URL.revokeObjectURL(localUrl);
     } catch (error) {
       URL.revokeObjectURL(localUrl);
       setPreviewUrl(profile?.avatarUrl ?? '');
       setErrors((current) => ({ ...current, avatarImageId: error instanceof Error ? error.message : '头像上传失败' }));
+    } finally {
+      window.setTimeout(() => setUploadProgress(null), 500);
     }
   };
 
-  return { profile, draft, errors, status, message, previewUrl, dirty, setField, save, load, chooseAvatar };
+  const resolveConflict = (choice: 'restore' | 'discard') => {
+    if (!conflict) return;
+    setProfile(conflict.currentProfile);
+    setDraft(choice === 'restore' ? conflict.localDraft : draftFrom(conflict.currentProfile));
+    if (choice === 'discard') setPreviewUrl(conflict.currentProfile.avatarUrl);
+    setConflict(null);
+    setErrors({});
+    setStatus('idle');
+    setMessage(choice === 'restore' ? '已基于最新版恢复本地草稿，请比较后再次保存' : '已采用最新版并放弃本地草稿');
+  };
+
+  return { profile, draft, errors, status, message, previewUrl, uploadProgress, conflict, dirty, setField, save, load, chooseAvatar, resolveConflict };
 }

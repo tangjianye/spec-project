@@ -41,7 +41,9 @@ export class UserRepository {
       ['13800000001', '用户一', 'ACTIVE', 0, null],
       ['13800000002', '用户二', 'ACTIVE', 9, null],
       ['13800000003', '用户三', 'LOCKED', 0, new Date(Date.now() + 20 * 60_000).toISOString()],
-      ['13800000004', '资料测试用户', 'ACTIVE', 0, null]
+      ['13800000004', '资料测试用户', 'ACTIVE', 0, null],
+      ['13800000005', '性能测试用户', 'ACTIVE', 0, null],
+      ['13800000006', '冲突测试用户', 'ACTIVE', 0, null]
     ];
     const pwdHash = bcrypt.hashSync(passwordPlain, 10);
     for (const [phone, nickname, status, errorCount, lockedUntil] of rows) {

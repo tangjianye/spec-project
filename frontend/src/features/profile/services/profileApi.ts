@@ -61,12 +61,15 @@ export interface AvatarUploadResult {
   expiresAt: string;
 }
 
-export async function uploadAvatar(file: File): Promise<AvatarUploadResult> {
+export async function uploadAvatar(file: File, onProgress?: (percent: number) => void): Promise<AvatarUploadResult> {
   const form = new FormData();
   form.append('avatar', file);
   try {
     const response = await http.post<Envelope<AvatarUploadResult>>('/profile/avatar', form, {
-      headers: { 'Content-Type': 'multipart/form-data' }
+      headers: { 'Content-Type': 'multipart/form-data' },
+      onUploadProgress: ({ loaded, total }) => {
+        if (total) onProgress?.(Math.min(100, Math.round((loaded / total) * 100)));
+      }
     });
     return response.data.data;
   } catch (error) {

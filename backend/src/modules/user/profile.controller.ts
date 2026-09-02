@@ -10,6 +10,11 @@ import { securityLog } from '../../common/logs/security-log.service.js';
 
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 5 * 1024 * 1024, files: 1 } });
 const allowed = new Set(['jpeg', 'png', 'webp']);
+const formatMediaTypes: Record<string, string> = {
+  jpeg: 'image/jpeg',
+  png: 'image/png',
+  webp: 'image/webp'
+};
 
 export const profileRouter = Router();
 profileRouter.use(requireAuth);
@@ -52,6 +57,9 @@ profileRouter.post('/avatar', (req, res, next) => {
       }
       if (!metadata.format || !allowed.has(metadata.format)) {
         throw new ApiError(ErrorCode.AVATAR_TYPE, 400, '请选择 JPEG、PNG 或 WebP 图片');
+      }
+      if (formatMediaTypes[metadata.format] !== req.file.mimetype) {
+        throw new ApiError(ErrorCode.AVATAR_TYPE, 400, '文件声明类型与图片内容不一致');
       }
       const normalized = await sharp(req.file.buffer)
         .rotate()

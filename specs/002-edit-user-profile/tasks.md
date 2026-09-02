@@ -237,3 +237,15 @@ Task: T036 Browser/E2E/a11y tests in frontend/tests/e2e/profile-edit.spec.ts
 - 每个任务均包含具体文件路径；多文件任务仅用于不可分割的装配或集成变更。
 - 先观察测试失败，再实现对应行为；每个 checkpoint 可独立验收。
 - 不在任务执行中扩大到手机号、密码、实名认证、头像裁剪或隐私权限配置。
+
+## Phase 7: Convergence
+
+- [X] T048 CRITICAL configure measurable 80% business-logic and 60% rendering-code coverage thresholds and a failing CI-compatible coverage command in backend/vitest.config.ts, frontend/vitest.config.ts, packages/shared-schemas/package.json, and package.json per Constitution V (missing)
+- [X] T049 CRITICAL add repeatable Playwright performance measurements for LCP, INP, CLS, and profile-save feedback latency with asserted budgets in frontend/tests/e2e/profile-performance.spec.ts per Constitution III and SC-002 (partial)
+- [X] T050 CRITICAL add independently renderable default, error, disabled, keyboard, and accessibility stories or interaction tests for ProfileForm, AvatarField, TextField, GenderField, and BirthdayField in frontend/src/features/profile/components/ProfileForm.stories.tsx per Constitution II and T043 (partial)
+- [X] T051 display the authenticated masked phone plus an explicit explanation that phone, password, and identity fields are managed outside this form in frontend/src/pages/EditProfilePage.tsx and frontend/src/features/profile/components/ProfileForm.tsx per FR-002 and US1/AC1 (partial)
+- [X] T052 preserve the pre-conflict local draft and provide explicit compare, restore, or discard actions when loading currentProfile in frontend/src/features/profile/hooks/useProfileForm.ts, frontend/src/features/profile/components/ProfileForm.tsx, and frontend/tests/integration/ProfileForm.resilience.test.tsx per FR-013 and SC-004 (partial)
+- [X] T053 reject declared MIME and decoded image-format mismatches while accepting only JPEG, PNG, and WebP in backend/src/modules/user/profile.controller.ts and backend/tests/contract/profile-avatar.spec.ts per contract: avatar MIME validation (contradicts)
+- [X] T054 implement deletion of expired temporary avatar buffers with an injectable clock and deterministic cleanup tests in backend/src/modules/user/avatar-storage.ts and backend/tests/unit/avatar-storage.test.ts per research: temporary cleanup and T028 (missing)
+- [X] T055 complete the promised avatar, resilience, authentication, two-window conflict, browser-refresh, keyboard, and failure-recovery coverage in backend/tests/contract/profile-avatar.spec.ts, frontend/tests/integration/ProfileForm.resilience.test.tsx, and frontend/tests/e2e/profile-edit.spec.ts per T025, T026, T035, and T036 (partial)
+- [X] T056 expose accessible avatar upload progress through frontend/src/features/profile/services/profileApi.ts, frontend/src/features/profile/hooks/useProfileForm.ts, frontend/src/features/profile/components/AvatarField.tsx, and frontend/tests/integration/AvatarField.test.tsx per T031 (partial)
