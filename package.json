@@ -1,0 +1,37 @@
+{
+  "name": "spec-project",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Spec-Driven Development demo: 手机号验证码登录 (001-phone-sms-login)",
+  "engines": {
+    "node": ">=20"
+  },
+  "packageManager": "pnpm@9.0.0",
+  "workspaces": [
+    "packages/*",
+    "frontend",
+    "backend"
+  ],
+  "scripts": {
+    "typecheck": "pnpm -r typecheck",
+    "lint": "pnpm -r lint",
+    "build": "pnpm -r build",
+    "test": "pnpm -r test",
+    "test:unit": "pnpm -r test:unit",
+    "test:integration": "pnpm -r test:integration",
+    "test:e2e": "pnpm --filter @spec/frontend test:e2e",
+    "dev": "pnpm --parallel --filter @spec/backend --filter @spec/frontend dev",
+    "storybook:test": "pnpm --filter @spec/frontend storybook:test"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "@typescript-eslint/eslint-plugin": "^7.16.0",
+    "@typescript-eslint/parser": "^7.16.0",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "jsx-a11y": "npm:eslint-plugin-jsx-a11y@^6.9.0",
+    "prettier": "^3.3.0",
+    "typescript": "^5.5.0"
+  }
+}

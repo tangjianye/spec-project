@@ -1,0 +1,35 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  quality-gates:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - name: Install deps
+        run: pnpm install --frozen-lockfile
+      - name: 1. Typecheck (宪法 V: TS strict)
+        run: pnpm typecheck
+      - name: 2. Lint (0 warnings)
+        run: pnpm lint
+      - name: 3. Unit + Integration tests
+        run: pnpm test
+        env:
+          USE_IN_MEMORY_STORE: "true"
+      - name: 4. Build (bundle check)
+        run: pnpm build
+      - name: 5. Playwright E2E
+        run: pnpm test:e2e
+      - name: 6. Storybook + axe-core a11y (宪法 IV)
+        run: pnpm storybook:test
