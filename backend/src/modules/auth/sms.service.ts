@@ -35,11 +35,12 @@ export class SmsService {
   }
 
   /** 发送验证码：冷却写入 + 验证码写入 5 分钟 TTL + 旧码作废（新码直接覆盖）
-   *  测试/本地模式：白名单手机号使用固定验证码（quickstart §1.2），便于 E2E 与 QA 验收。
+   *  本地/测试模式（NODE_ENV !== production）：白名单手机号使用固定验证码（README §快速开始），
+   *  便于本地体验与 QA 验收；生产环境不受影响。
    */
   async send(phone: string): Promise<{ code: string; expiresAt: string; cooldownSeconds: number }> {
     const code =
-      config.smsTestWhitelist.includes(phone) && process.env.NODE_ENV === 'test'
+      process.env.NODE_ENV !== 'production' && config.smsTestWhitelist.includes(phone)
         ? config.smsTestFixedCode
         : this.generateCode();
     const now = Date.now();

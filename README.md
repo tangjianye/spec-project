@@ -16,22 +16,33 @@
 - **前端**：React 18 + TypeScript(strict) + Vite + Zustand + React Router v6 + Zod
 - **后端**：Node.js 20 + Express + Redis(ioredis) + JWT + bcryptjs + validator
 - **测试**：Vitest + RTL + MSW（单测/集成）、Playwright + axe-core（E2E/A11y）
-- **Monorepo**：pnpm workspace（`frontend` / `backend` / `packages/shared-schemas`）
+- **Monorepo**：npm workspaces（`frontend` / `backend` / `packages/shared-schemas`，pnpm 兼容）
 
 ## 快速开始
 
-```bash
-# 安装依赖（需要 Node 20 + pnpm 9）
-npx -y pnpm@9 install
+> 要求 Node.js ≥ 20。后端默认使用内存存储（`USE_IN_MEMORY_STORE=true`），无 Redis 也能直接运行。
 
-# 启动后端（默认 USE_IN_MEMORY_STORE=true，无 Redis 也能跑）
+### 方式一：根目录一键启动（推荐）
+
+```bash
+# 1) 安装依赖
+npm install
+
+# 2) 同时启动后端(3001) + 前端(5173)
+npm run dev
+```
+
+### 方式二：分终端启动
+
+```bash
+# 终端 1：后端
 cd backend && npm run dev
 
-# 启动前端（另开终端）
+# 终端 2：前端
 cd frontend && npm run dev
 ```
 
-浏览器访问 `http://localhost:5173/login`，测试账号（测试通道固定验证码 `123456`）：
+浏览器访问 `http://localhost:5173/login`，测试账号（测试通道固定验证码 `135792`）：
 
 | 手机号 | 密码 | 用途 |
 |--------|------|------|
@@ -40,14 +51,17 @@ cd frontend && npm run dev
 | 13800000003 | Password123! | 已锁定（20 分钟后解锁） |
 | 13800000099 | — | 未注册（防枚举验证） |
 
+> 说明：`135792` 是弱码防御规则（拒绝 6 个相同数字与 123456/654321 等连续序列）下的合法测试验证码；
+> 本地/测试环境（`NODE_ENV !== 'production'`）且手机号在白名单（见 `.env.example` 的 `SMS_TEST_WHITELIST`，默认含上述测试号）时统一使用固定码；生产环境仍为随机 6 位数字。
+
 ## 质量门禁（宪法合规）
 
 ```bash
-pnpm typecheck   # TS strict，0 any
-pnpm lint        # ESLint + Prettier，0 warnings
-pnpm test        # Vitest 单测 + 集成（USE_IN_MEMORY_STORE=true）
-pnpm build       # Vite/TS 构建
-pnpm test:e2e    # Playwright E2E + WCAG axe 断言（需先启前后端或由 webServer 拉起）
+npm run typecheck   # TS strict，0 any
+npm run lint        # ESLint + Prettier，0 warnings
+npm test            # Vitest 单测 + 集成（USE_IN_MEMORY_STORE=true）
+npm run build       # Vite/TS 构建
+npm run test:e2e    # Playwright E2E + WCAG axe 断言（webServer 自动拉起前后端）
 ```
 
 ## 目录结构

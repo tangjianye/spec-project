@@ -4,7 +4,7 @@
  * 生产私钥从 env RSA_PRIVATE_KEY_PEM / file 注入，绝不可进入 git。
  */
 import { readFileSync } from 'node:fs';
-import { createPrivateKey, createPublicKey, generateKeyPairSync } from 'node:crypto';
+import { createPublicKey, generateKeyPairSync } from 'node:crypto';
 import { config } from '../../config/env.js';
 
 export interface PublicKeyInfo {
