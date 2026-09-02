@@ -46,7 +46,7 @@ export function loadConfig(): AppConfig {
     frontendOrigin: process.env.FRONTEND_ORIGIN ?? 'http://localhost:5173',
     redisUrl: process.env.REDIS_URL ?? 'redis://localhost:6379',
     smsProviderKey: process.env.SMS_PROVIDER_KEY ?? 'test-provider-key',
-    smsTestWhitelist: (process.env.SMS_TEST_WHITELIST ?? '13800000000,13800000001,13800000002,13800000003')
+    smsTestWhitelist: (process.env.SMS_TEST_WHITELIST ?? '13800000000,13800000001,13800000002,13800000003,13800000004')
       .split(',')
       .filter(Boolean),
     smsTestFixedCode: process.env.SMS_TEST_FIXED_CODE ?? '135792',

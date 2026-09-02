@@ -18,6 +18,7 @@ interface AuthState {
   accessTokenExpiresAt: string | null;
   setAuth: (user: AuthUser, token: string, expiresAt: string) => void;
   setToken: (token: string, expiresAt: string) => void;
+  updateUserSummary: (summary: Pick<AuthUser, 'nickname' | 'avatarUrl'>) => void;
   clearAuth: () => void;
 }
 
@@ -31,6 +32,9 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   /** 静默刷新成功：仅更新 accessToken */
   setToken: (token, expiresAt) => set({ accessToken: token, accessTokenExpiresAt: expiresAt }),
+
+  updateUserSummary: (summary) =>
+    set((state) => ({ user: state.user ? { ...state.user, ...summary } : null })),
 
   /** 登出 / 令牌失效：清空全部登录态 */
   clearAuth: () => set({ user: null, accessToken: null, accessTokenExpiresAt: null })

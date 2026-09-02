@@ -1,6 +1,14 @@
-# Spec Project — 手机号验证码登录（001-phone-sms-login）
+# Spec Project — 登录与用户资料编辑
 
 遵循 [Spec Kit](.specify/) 规范驱动开发流程构建的"手机号 + 短信验证码 + 密码加密"安全登录功能。
+
+## 用户资料编辑（002-edit-user-profile）
+
+- 受鉴权保护的 `/profile/edit` 页面，可编辑昵称、个人简介、性别和生日
+- JPEG/PNG/WebP 头像预览与上传，最大 5 MB，服务端验证并统一转为 WebP
+- 版本号乐观并发控制，旧页面提交返回 409，不静默覆盖
+- 保存失败保留草稿，应用内导航和刷新提供未保存提醒
+- 规格、计划、契约与任务见 [specs/002-edit-user-profile](specs/002-edit-user-profile/)
 
 ## 功能范围（见 [spec.md](specs/001-phone-sms-login/spec.md)）
 
@@ -44,11 +52,14 @@ cd frontend && npm run dev
 
 浏览器访问 `http://localhost:5173/login`，测试账号（测试通道固定验证码 `135792`）：
 
+登录后可从 Dashboard 点击“编辑资料”，或直接访问 `http://localhost:5173/profile/edit`。
+
 | 手机号 | 密码 | 用途 |
 |--------|------|------|
 | 13800000001 | Password123! | 正常登录 |
 | 13800000002 | Password123! | 密码错误计数已 9 次（1 次错误即锁定） |
 | 13800000003 | Password123! | 已锁定（20 分钟后解锁） |
+| 13800000004 | Password123! | 用户资料编辑 E2E 隔离账号 |
 | 13800000099 | — | 未注册（防枚举验证） |
 
 > 说明：`135792` 是弱码防御规则（拒绝 6 个相同数字与 123456/654321 等连续序列）下的合法测试验证码；
@@ -69,6 +80,8 @@ npm run test:e2e    # Playwright E2E + WCAG axe 断言（webServer 自动拉起�
 ```text
 specs/001-phone-sms-login/   # 规范-计划-任务-验收文档
 frontend/src/features/auth/  # 登录组件/Hook/Schema/Store/守卫
+frontend/src/features/profile/ # 资料表单、头像、草稿与冲突处理
 backend/src/modules/auth/    # 验证码/登录/刷新/登出 + 安全策略
+backend/src/modules/user/    # 用户资料、版本更新和头像存储
 packages/shared-schemas/     # 前后端共用 Zod 校验规则
 ```

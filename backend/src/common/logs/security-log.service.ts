@@ -18,7 +18,10 @@ export type SecurityEventType =
   | 'RATE_LIMIT_HIT'
   | 'TOKEN_REFRESHED'
   | 'TOKEN_REVOKED'
-  | 'MALICIOUS_INPUT_DETECTED';
+  | 'MALICIOUS_INPUT_DETECTED'
+  | 'PROFILE_UPDATED'
+  | 'PROFILE_CONFLICT'
+  | 'PROFILE_AVATAR_UPLOADED';
 
 export interface SecurityLogEntry {
   eventId: string;

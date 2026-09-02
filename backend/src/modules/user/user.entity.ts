@@ -5,6 +5,7 @@
  */
 import bcrypt from 'bcryptjs';
 import { createHash } from 'node:crypto';
+import type { NormalizedProfileUpdate, ProfileGender, UserProfile } from '@spec/shared-schemas';
 
 export type AccountStatus = 'ACTIVE' | 'LOCKED' | 'DISABLED';
 
@@ -13,6 +14,12 @@ export interface UserRecord {
   phoneHash: string; // 手机号可检索哈希（防枚举，不落明文）
   nickname: string;
   avatarUrl: string;
+  avatarImageId: string | null;
+  bio: string | null;
+  gender: ProfileGender;
+  birthDate: string | null;
+  profileVersion: number;
+  profileUpdatedAt: string;
   passwordHash: string; // bcrypt
   accountStatus: AccountStatus;
   lockedUntil: string | null;
@@ -33,7 +40,8 @@ export class UserRepository {
     const rows: Array<[string, string, AccountStatus, number, string | null]> = [
       ['13800000001', '用户一', 'ACTIVE', 0, null],
       ['13800000002', '用户二', 'ACTIVE', 9, null],
-      ['13800000003', '用户三', 'LOCKED', 0, new Date(Date.now() + 20 * 60_000).toISOString()]
+      ['13800000003', '用户三', 'LOCKED', 0, new Date(Date.now() + 20 * 60_000).toISOString()],
+      ['13800000004', '资料测试用户', 'ACTIVE', 0, null]
     ];
     const pwdHash = bcrypt.hashSync(passwordPlain, 10);
     for (const [phone, nickname, status, errorCount, lockedUntil] of rows) {
@@ -42,6 +50,12 @@ export class UserRepository {
         phoneHash: UserRepository.hashPhone(phone),
         nickname,
         avatarUrl: '',
+        avatarImageId: null,
+        bio: null,
+        gender: null,
+        birthDate: null,
+        profileVersion: 1,
+        profileUpdatedAt: new Date().toISOString(),
         passwordHash: pwdHash,
         accountStatus: status,
         lockedUntil,
@@ -61,6 +75,46 @@ export class UserRepository {
 
   findById(userId: string): UserRecord | null {
     return this.byId.get(userId) ?? null;
+  }
+
+  toProfile(record: UserRecord): UserProfile {
+    return {
+      userId: record.userId,
+      nickname: record.nickname,
+      bio: record.bio,
+      gender: record.gender,
+      birthDate: record.birthDate,
+      avatarImageId: record.avatarImageId,
+      avatarUrl: record.avatarUrl,
+      version: record.profileVersion,
+      updatedAt: record.profileUpdatedAt
+    };
+  }
+
+  updateProfile(
+    userId: string,
+    update: NormalizedProfileUpdate,
+    avatarUrl: string
+  ): { status: 'updated'; profile: UserProfile } | { status: 'conflict'; profile: UserProfile } | { status: 'missing' } {
+    const current = this.byId.get(userId);
+    if (!current) return { status: 'missing' };
+    if (current.profileVersion !== update.expectedVersion) {
+      return { status: 'conflict', profile: this.toProfile(current) };
+    }
+
+    const updated: UserRecord = {
+      ...current,
+      nickname: update.nickname,
+      bio: update.bio,
+      gender: update.gender,
+      birthDate: update.birthDate,
+      avatarImageId: update.avatarImageId,
+      avatarUrl,
+      profileVersion: current.profileVersion + 1,
+      profileUpdatedAt: new Date().toISOString()
+    };
+    this.upsert(updated);
+    return { status: 'updated', profile: this.toProfile(updated) };
   }
 
   verifyPassword(record: UserRecord, plain: string): boolean {

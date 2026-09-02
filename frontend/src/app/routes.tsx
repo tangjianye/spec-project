@@ -8,6 +8,7 @@ import { RequireAuth } from '../features/auth/guards/RequireAuth';
 
 const LoginPage = lazy(() => import('../pages/LoginPage'));
 const DashboardPage = lazy(() => import('../pages/DashboardPage'));
+const EditProfilePage = lazy(() => import('../pages/EditProfilePage'));
 
 function Loading() {
   return <div aria-busy="true">加载中…</div>;
@@ -18,6 +19,10 @@ export function AppRoutes() {
     <Suspense fallback={<Loading />}>
       <Routes>
         <Route path="/login" element={<LoginPage />} />
+        <Route
+          path="/profile/edit"
+          element={<RequireAuth><EditProfilePage /></RequireAuth>}
+        />
         <Route
           path="/dashboard"
           element={

@@ -9,6 +9,7 @@ import { authRouter } from './modules/auth/auth.controller.js';
 import { security } from './modules/auth/security.instance.js';
 import { createInputGuard } from './common/filters/input-guard.js';
 import { errorFilter } from './common/filters/response-filter.js';
+import { profileRouter } from './modules/user/profile.controller.js';
 
 export function createApp(): express.Express {
   const app = express();
@@ -39,6 +40,8 @@ export function createApp(): express.Express {
   app.use('/api/v1/auth', createInputGuard(security));
 
   app.use('/api/v1/auth', authRouter);
+  app.use('/api/v1/profile', createInputGuard(security));
+  app.use('/api/v1/profile', profileRouter);
 
   app.use(errorFilter);
 

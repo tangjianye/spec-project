@@ -18,7 +18,22 @@ export const ErrorCode = {
   RATE_LIMIT: 10009,
   MALICIOUS_INPUT: 10010,
   TOKEN_EXPIRED: 10011,
-  TOKEN_INVALID: 10012
+  TOKEN_INVALID: 10012,
+  PROFILE_VALIDATION: 20001,
+  PROFILE_CONFLICT: 20002,
+  AVATAR_TYPE: 20003,
+  AVATAR_TOO_LARGE: 20004,
+  AVATAR_CORRUPT: 20005,
+  AVATAR_UNAVAILABLE: 20006
+} as const;
+
+export const ProfileErrorCode = {
+  VALIDATION: ErrorCode.PROFILE_VALIDATION,
+  CONFLICT: ErrorCode.PROFILE_CONFLICT,
+  AVATAR_TYPE: ErrorCode.AVATAR_TYPE,
+  AVATAR_TOO_LARGE: ErrorCode.AVATAR_TOO_LARGE,
+  AVATAR_CORRUPT: ErrorCode.AVATAR_CORRUPT,
+  AVATAR_UNAVAILABLE: ErrorCode.AVATAR_UNAVAILABLE
 } as const;
 
 /** 中国大陆 11 位手机号：1 开头，第二位 3-9，其余 9 位数字（spec FR-001） */
@@ -60,3 +75,56 @@ export const loginPayloadSchema = z.object({
 
 export type SendSmsPayload = z.infer<typeof sendSmsSchema>;
 export type LoginPayload = z.infer<typeof loginPayloadSchema>;
+
+export const profileGenderSchema = z.enum(['female', 'male', 'other', 'undisclosed']).nullable();
+
+export const nicknameSchema = z
+  .string()
+  .transform((value) => value.trim())
+  .pipe(z.string().min(2).max(30).refine((value) => /\S/u.test(value)));
+
+export const bioSchema = z
+  .string()
+  .max(200)
+  .transform((value) => value.trim() || null)
+  .nullable();
+
+const plainDatePattern = /^\d{4}-\d{2}-\d{2}$/;
+
+export const birthDateSchema = z
+  .string()
+  .regex(plainDatePattern)
+  .refine((value) => {
+    const date = new Date(`${value}T00:00:00.000Z`);
+    return !Number.isNaN(date.getTime()) && date.toISOString().slice(0, 10) === value;
+  })
+  .refine((value) => value <= new Date().toISOString().slice(0, 10))
+  .nullable();
+
+export const profileImageIdSchema = z.string().min(1).max(128).nullable();
+
+export const profileSchema = z.object({
+  userId: z.string().min(1),
+  nickname: nicknameSchema,
+  bio: bioSchema,
+  gender: profileGenderSchema,
+  birthDate: birthDateSchema,
+  avatarImageId: profileImageIdSchema,
+  avatarUrl: z.string(),
+  version: z.number().int().positive(),
+  updatedAt: z.string().datetime()
+});
+
+export const profileUpdateSchema = z.object({
+  expectedVersion: z.number().int().positive(),
+  nickname: nicknameSchema,
+  bio: bioSchema,
+  gender: profileGenderSchema,
+  birthDate: birthDateSchema,
+  avatarImageId: profileImageIdSchema
+});
+
+export type ProfileGender = z.infer<typeof profileGenderSchema>;
+export type UserProfile = z.infer<typeof profileSchema>;
+export type ProfileUpdatePayload = z.input<typeof profileUpdateSchema>;
+export type NormalizedProfileUpdate = z.output<typeof profileUpdateSchema>;

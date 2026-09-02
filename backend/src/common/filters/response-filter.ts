@@ -12,7 +12,8 @@ export class ApiError extends Error {
     public readonly code: number,
     public readonly httpStatus: number,
     message: string,
-    public readonly errors?: Array<{ field: string; message: string }>
+    public readonly errors?: Array<{ field: string; message: string }>,
+    public readonly data?: unknown
   ) {
     super(message);
     this.name = 'ApiError';
@@ -23,12 +24,14 @@ export function errorFilter(err: unknown, req: Request, res: Response, _next: Ne
   const requestId = (req.headers['x-request-id'] as string) ?? randomUUID();
 
   if (err instanceof ApiError) {
-    res.status(err.httpStatus).json({
+    const body: Record<string, unknown> = {
       code: err.code,
       message: err.message,
       errors: err.errors ?? [],
       requestId
-    });
+    };
+    if (err.data !== undefined) body.data = err.data;
+    res.status(err.httpStatus).json(body);
     return;
   }
 

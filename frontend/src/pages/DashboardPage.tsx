@@ -1,5 +1,6 @@
 import { useAuthStore } from '../features/auth/store/useAuthStore';
 import { logout } from '../features/auth/services/authApi';
+import { Link } from 'react-router-dom';
 
 export default function DashboardPage() {
   const user = useAuthStore((s) => s.user);
@@ -18,6 +19,7 @@ export default function DashboardPage() {
           <div>
             <strong>{user?.nickname}</strong>
             <span className="phone-masked">{user?.phoneMasked}</span>
+            <Link to="/profile/edit" className="profile-link">编辑资料</Link>
           </div>
         </div>
         <button type="button" className="logout-btn" onClick={() => void logout()}>
